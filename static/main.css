@@ -1,0 +1,43 @@
+body {
+    margin: 2%;
+    font-size: 18px;
+    background-color: #f0f0f0;
+}
+
+h1, h3 {
+    text-align: center;
+    color: #333;
+}
+
+.progress {
+    height: 30px;
+    margin-top: 5px;
+
+}
+
+.progress-bar {
+    font-size: 20px;
+    line-height: 30px;
+}
+
+#footer {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    color: #3a3;
+}
+
+.bar rect {
+  fill: steelblue;
+  shape-rendering: crispEdges;
+}
+
+.bar text {
+  fill: #f0f0f0;
+}
+
+.axis path, .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
