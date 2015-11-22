@@ -39,7 +39,8 @@ import contextlib
 params = {}
 
 def getParams(transcribed, d):
-    parts = transcribed.split()
+    s = ''.join(ch for ch in transcribed if ch not in exclude)
+    parts = s.split()
 
     fld = []
     val = []
@@ -97,7 +98,8 @@ class PHandler(BaseHandler):
     def get(self):
         upload_url = blobstore.create_upload_url('/audio')
         tv = {
-            'params': json.dumps(params)
+            'params': json.dumps(params),
+            'upload_url': upload_url
         }
         print 'AAA'
         print tv
@@ -111,29 +113,16 @@ class AudioHandler(BaseHandler,blobstore_handlers.BlobstoreUploadHandler):
     Ajax handler to convert audio and get wordcloud
     """
     def post(self):
-        # print 'AAA'
         # upload_files = self.get_uploads('audio_file')
-        # print upload_files
-        # print 'BBB'
-        # print self.get_uploads()[0]
-        # print 'CCC'
-
         # upload_files = self.get_uploads('audio_file')
         # transcribed = jennyCode(upload_files)
         # d = getDuration(upload_files)
-        transcribed = 'hello like like like no no way'
-        d=50
+
+        transcribed = self.request.get('typed')
+        d=5
         
         global params
         params = getParams(transcribed, d)
-        # params = {
-        #     'WPM':120,
-        #     'Vocab':5,
-        #     'WC':11,
-        #     'values':[1,1,2,2,2,3,3,3,3,3,3,4,4,6,6,6,8,8,8,8,8,12,12,13],
-        #     'fl': [{"text":"study","size":40},{"text":"motion","size":15},{"text":"forces","size":10},{"text":"electricity","size":15},{"text":"movement","size":10},{"text":"relation","size":5},{"text":"things","size":10},{"text":"force","size":5},{"text":"ad","size":5},{"text":"energy","size":85},{"text":"living","size":5},{"text":"nonliving","size":5},{"text":"laws","size":15},{"text":"speed","size":45},{"text":"velocity","size":30},{"text":"define","size":5},{"text":"constraints","size":5},{"text":"universe","size":10},{"text":"physics","size":120},{"text":"describing","size":5},{"text":"matter","size":90},{"text":"physics-the","size":5},{"text":"world","size":10}],
-        #     'text': "we will show them who is boss"
-        # }
 
         self.redirect('/ph') 
         # self.response.out.write(json.dumps(params))

@@ -1,6 +1,6 @@
-# import requests
+import requests
 import json
-import urllib2
+from requests.exceptions import ConnectionError
 
 proxyDict = {
 	# "http"  : http_proxy,
@@ -61,9 +61,15 @@ class HODClient(object):
 					callback("", self.errorsList)
 				else:
 					callback(resp, None)
-		except Exception:
-			self.__createErrorObject(ErrorCode.TIMEOUT, "Request timeout")
-			callback("", self.errorsList)
+		except requests.Timeout:
+			self.__createErrorObject(ErrorCode.TIMEOUT, "timeout")
+			callback ("", self.errorsList)
+		except requests.HTTPError:
+			self.__createErrorObject(ErrorCode.HTTP_ERROR, "HTTP error")
+			callback ("", self.errorsList)
+		except ConnectionError:
+			self.__createErrorObject(ErrorCode.CONNECTION_ERROR, "Connection error")
+			callback ("", self.errorsList)
 
 	def PostRequest(self, params, hodApp, async, callback):
 		queryStr = self.hodEndPoint
@@ -122,8 +128,11 @@ class HODClient(object):
 						callback("", self.errorsList)
 					else:
 						callback(jobID, None)
-		except Exception:
+		except requests.Timeout:
 			self.__createErrorObject(ErrorCode.TIMEOUT, "Request timeout")
+			callback("", self.errorsList)
+		except requests.ConnectionError:
+			self.__createErrorObject(ErrorCode.CONNECTION_ERROR, "Connection error")
 			callback("", self.errorsList)
 
 	def GetRequest(self, params, hodApp, async, callback):
@@ -169,9 +178,12 @@ class HODClient(object):
 						callback("", self.errorsList)
 					else:
 						callback(jobID, None)
-		except Exception:
+		except requests.Timeout:
 			self.__createErrorObject(ErrorCode.TIMEOUT, "Request timeout")
-			callback("", self.errorsList)
+			callback ("", self.errorsList)
+		except requests.ConnectionError:
+			self.__createErrorObject(ErrorCode.CONNECTION_ERROR, "Connection error")
+			callback ("", self.errorsList)
 
 	def __createErrorObject(self,code, reason, detail=""):
 		self.errorsList.resetErrorList()

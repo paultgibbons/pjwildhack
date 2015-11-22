@@ -25,6 +25,17 @@ input {
     margin-bottom: 10px;
 }
 
+textarea {
+  width: 80%;
+  height: 100px;
+  margin-left: 10%;
+  margin-right: 10%;
+}
+
+.wordcloud {
+  margin-left: 25%;
+}
+
 #hp {
     font-style: italic;
     color: #888;

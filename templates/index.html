@@ -41,6 +41,7 @@
 <script type="text/javascript" src="/static/cloud.js"></script>
 
 <form id="usrform" action="{{upload_url}}" method="post" enctype="multipart/form-data">
+  <div style="display:none">
    <button type="buton" class="btn btn-primary" onclick="startRecording(this);">record</button>
    <button type="buton" class="btn btn-primary" onclick="stopRecording(this);" disabled>stop</button>
    
@@ -49,9 +50,12 @@
 
    <script type="text/javascript" src="/static/record.js"></script>
    <script src="/static/recorder.js"></script>
-
+  
    <input type="file" id="audio_file" name="audio_file">
-   <input class="btn" type="submit" value="Submit" id="submit" disabled>
+  </div>
+   <!-- <input type="text" name="typed"> -->
+   <textarea form="usrform" name="typed"></textarea>
+   <input class="btn" type="submit" value="Submit" id="submit">
 </form>
 <table class = "table">
    <tbody>
@@ -62,7 +66,7 @@
       </tr>
       <tr>
         <td>
-          <p id="hp">Transcibing powered by Haven OnDemand HP</p>
+          <p id="hp">Hosted on Google App Engine</p>
           <p id="text"></p>
         </td>
       </tr>
