@@ -135,7 +135,7 @@ class AudioHandler(BaseHandler,blobstore_handlers.BlobstoreUploadHandler):
         #     'text': "we will show them who is boss"
         # }
 
-        self.redirect('/ph')
+        self.redirect('/ph') 
         # self.response.out.write(json.dumps(params))
 
 app = webapp2.WSGIApplication([
