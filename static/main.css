@@ -4,15 +4,36 @@ body {
     background-color: #f0f0f0;
 }
 
+.page-header {
+    margin-bottom: 5px;
+}
+
 h1, h3 {
     text-align: center;
     color: #333;
 }
 
+a {
+    float: right;
+}
+
+/*#audio_url {
+    display: none;
+}*/
+
+input {
+    margin-bottom: 10px;
+}
+
+#hp {
+    font-style: italic;
+    color: #888;
+    font-size: 16px;
+}
+
 .progress {
     height: 30px;
     margin-top: 5px;
-
 }
 
 .progress-bar {

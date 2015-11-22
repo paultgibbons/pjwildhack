@@ -1,36 +1,69 @@
 {% extends "base.html" %}
 
 {% block content %}
-<script src="//d3js.org/d3.v3.min.js"></script>
-<form
-   action="http://<host>/1/job"
-   method="post"
-   enctype="multipart/form-data">
-<input
-   type="hidden"
-   class="form-control"
-   name="apikey"
-   value= ABCDEFG >
-<input
-   type="hidden"
-   name="job"
-   value='{
-   "actions": [
-      { "name": "highlight", "version": "v1", "params": {
-         "file": "file1",
-         "highlight_expression": "breakPath"
-      } }
-   ]
-}'>
 
-   <input type="file" name="file1">
-   <input type="submit" value="Submit">
+<script src="/static/d3.js"></script>
+<script type="text/javascript" src="/static/wfg.js"></script>
+<script type="text/javascript">
+ function setWPM(wpm) {
+   document.getElementById('WPM').innerHTML = wpm;
+   var speed = (Math.max(Math.min(wpm,200),20))/2;
+   document.getElementById('WPMbar').style.width = (speed.toString())+'%';
+ } 
+
+ function setVocab(vocab) {
+   document.getElementById('Vocab').innerHTML = vocab;
+   var speed = (Math.max(Math.min(vocab,20),2))*5;
+   document.getElementById('Vocabbar').style.width = (speed.toString())+'%';
+ }
+
+ function setWC(wc) {
+   document.getElementById('WC').innerHTML = wc;
+   var speed = (Math.max(Math.min(wc,20),2))*5;
+   document.getElementById('WCbar').style.width = (speed.toString())+'%';
+ }
+
+ function setText(text) {
+   document.getElementById('text').innerHTML = text;
+ }
+
+ function processResult(result) {
+    setWPM(result['WPM']);
+    setVocab(result['Vocab']);
+    setWC(result['WC']);
+    setText(result['text']);
+    drawGraph(result['values']);
+    drawCloud(result['fl']);
+ }
+</script>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script type="text/javascript" src="/static/d3.layout.cloud.js"></script>
+<script type="text/javascript" src="/static/cloud.js"></script>
+
+<form id="usrform" action="{{upload_url}}" method="post" enctype="multipart/form-data">
+   <button type="buton" class="btn btn-primary" onclick="startRecording(this);">record</button>
+   <button type="buton" class="btn btn-primary" onclick="stopRecording(this);" disabled>stop</button>
+   
+   <h3>Recording</h3>
+   <div id="recordingslist"></div>
+
+   <script type="text/javascript" src="/static/record.js"></script>
+   <script src="/static/recorder.js"></script>
+
+   <input type="file" id="audio_file" name="audio_file">
+   <input class="btn" type="submit" value="Submit" id="submit" disabled>
 </form>
 <table class = "table">
    <tbody>
       <tr>
         <td class="col-md-12">
-          Word Cloud
+          <div id="legend"></div>
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <p id="hp">Transcibing powered by Haven OnDemand HP</p>
+          <p id="text"></p>
         </td>
       </tr>
       <tr>
@@ -38,7 +71,7 @@
           <ul class="list-group">
             <li class="list-group-item">
               <div class="progress">
-                <div class="progress-bar progress-bar-danger" style="width: 100%">
+                <div class="progress-bar progress-bar-danger" style="width: 100%" id="WPMbar">
                   WPM: <span id="WPM">0</span>
                 </div>
                 
@@ -46,15 +79,15 @@
             </li>
             <li class="list-group-item">
               <div class="progress">
-                <div class="progress-bar progress-bar-warning" style="width: 100%">
-                  Vocabulary: 0 words
+                <div class="progress-bar progress-bar-warning" style="width: 100%" id="Vocabbar">
+                  Vocabulary: <span id="Vocab">0</span> words
                 </div>
               </div>
             </li>
             <li class="list-group-item">
               <div class="progress">
-                <div class="progress-bar progress-bar-success" style="width: 100%">
-                  Word Count: 0 words
+                <div class="progress-bar progress-bar-success" style="width: 100%" id="WCbar">
+                  Word Count: <span id="WC">0</span> words
                 </div>
               </div>
             </li>
@@ -69,62 +102,10 @@
       </tr>
    </tbody>
 </table>
-<script>
-var values = [5,5,5,3,3,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,6,6,1,8,8,8,9,9]
-
-// A formatter for counts.
-var formatCount = d3.format(",.0f");
-
-var pagewidth = document.body.clientWidth;
-var margin = {top: 10, right: pagewidth/5, bottom: 30, left: pagewidth/5},
-    width = 6 * pagewidth/10,
-    height = 400 - margin.top - margin.bottom;
-
-var x = d3.scale.linear()
-    .domain([0, 15])
-    .range([0, width]);
-
-var data = d3.layout.histogram()
-    .bins(x.ticks(15))
-    (values);
-
-var y = d3.scale.linear()
-    .domain([0, d3.max(data, function(d) { return d.y; })])
-    .range([height, 0]);
-
-var xAxis = d3.svg.axis()
-    .scale(x)
-    .orient("bottom");
-
-// var svg = d3.select("body").append("svg")
-var svg = d3.select(document.getElementById("wcg")).append("svg")
-    .attr("width", width + margin.left + margin.right)
-    .attr("height", height + margin.top + margin.bottom)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-var bar = svg.selectAll(".bar")
-    .data(data)
-    .enter().append("g")
-    .attr("class", "bar")
-    .attr("transform", function(d) { return "translate(" + x(d.x) + "," + y(d.y) + ")"; });
-
-bar.append("rect")
-    .attr("x", 1)
-    .attr("width", x(data[0].dx) - 1)
-    .attr("height", function(d) { return height - y(d.y); });
-
-bar.append("text")
-    .attr("dy", ".75em")
-    .attr("y", 6)
-    .attr("x", x(data[0].dx) / 2)
-    .attr("text-anchor", "middle")
-    .text(function(d) { return formatCount(d.y); });
-
-svg.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(xAxis);
+<script type="text/javascript">
+  drawCloud([{'text':'Wildhacks', 'size':40}]);
+  {% if params != {} %}
+    processResult({{params|safe}});
+  {% endif %}
 </script>
-
 {% endblock %}
